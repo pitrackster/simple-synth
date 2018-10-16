@@ -1,8 +1,23 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import logo from './logo.svg'
+import './assets/css/App.css'
+import Osc from './core/osc'
 
 class App extends Component {
+  constructor(){
+    super()
+    this.ac = new AudioContext()
+    this.osc = new Osc(this.ac)
+    this.master = this.ac.createGain()
+    this.master.connect(this.ac.destination)
+    this.master.gain.value = 0.5
+    this.osc.start(440, 0.5, this.master)
+    window.setTimeout(() => {
+      this.osc.stop(440, this.master)
+    }, 1000)
+
+  }
+
   render() {
     return (
       <div className="App">
@@ -21,8 +36,8 @@ class App extends Component {
           </a>
         </header>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
