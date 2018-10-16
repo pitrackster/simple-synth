@@ -1,21 +1,42 @@
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import './assets/css/App.css'
-import Osc from './core/osc'
+//import Osc from './core/osc'
+import Note from './core/note'
 
 class App extends Component {
   constructor(){
     super()
     this.ac = new AudioContext()
-    this.osc = new Osc(this.ac)
     this.master = this.ac.createGain()
     this.master.connect(this.ac.destination)
-    this.master.gain.value = 0.5
-    this.osc.start(440, 0.5, this.master)
-    window.setTimeout(() => {
-      this.osc.stop(440, this.master)
-    }, 1000)
+    this.master.gain.value = 1
 
+  }
+
+  playOneNote() {
+    const note1 = new Note(this.ac)
+    note1.start(440, 1, this.master)
+    window.setTimeout(() => {
+      note1.stop(440, this.master)
+    }, 1000)
+  }
+
+  playThreeNotes() {
+    const note1 = new Note(this.ac)
+    const note2 = new Note(this.ac)
+    const note3 = new Note(this.ac)
+    const note4 = new Note(this.ac)
+    note1.start(440, 0.25, this.master)
+    note2.start(220, 0.25, this.master)
+    note3.start(880, 0.25, this.master)
+    note4.start(550, 0.25, this.master)
+    window.setTimeout(() => {
+      note1.stop(440, this.master)
+      note2.stop(220, this.master)
+      note3.stop(880, this.master)
+      note4.stop(550, this.master)
+    }, 1000)
   }
 
   render() {
@@ -34,6 +55,8 @@ class App extends Component {
           >
             Learn React
           </a>
+          <button onClick={() => this.playOneNote()}>One</button>
+          <button onClick={() => this.playThreeNotes()}>3</button>
         </header>
       </div>
     )
