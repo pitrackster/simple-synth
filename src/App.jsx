@@ -1,43 +1,44 @@
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import './assets/css/App.css'
-//import Osc from './core/osc'
-import Note from './core/note'
+import Voice from './core/voice'
+import VuMeter from './components/vu-meter-cmp'
 
 class App extends Component {
-  constructor(){
+  constructor() {
     super()
     this.ac = new AudioContext()
     this.master = this.ac.createGain()
     this.master.connect(this.ac.destination)
     this.master.gain.value = 1
-
+    this.meter = null
   }
 
-  playOneNote() {
-    const note1 = new Note(this.ac)
-    note1.start(440, 1, this.master)
+  playOneVoice() {
+    const voice = new Voice(this.ac)
+    voice.start(440, 1, this.master)
     window.setTimeout(() => {
-      note1.stop(440, this.master)
-    }, 1000)
+      voice.stop(this.master)
+    }, 3000)
   }
 
-  playThreeNotes() {
-    const note1 = new Note(this.ac)
-    const note2 = new Note(this.ac)
-    const note3 = new Note(this.ac)
-    const note4 = new Note(this.ac)
-    note1.start(440, 0.25, this.master)
-    note2.start(220, 0.25, this.master)
-    note3.start(880, 0.25, this.master)
-    note4.start(550, 0.25, this.master)
+  playMultipleVoices() {
+    const voice1 = new Voice(this.ac)
+    const voice2 = new Voice(this.ac)
+    const voice3 = new Voice(this.ac)
+    const voice4 = new Voice(this.ac)
+    voice1.start(440, 0.25, this.master)
+    voice2.start(220, 0.25, this.master)
+    voice3.start(880, 0.25, this.master)
+    voice4.start(550, 0.25, this.master)
     window.setTimeout(() => {
-      note1.stop(440, this.master)
-      note2.stop(220, this.master)
-      note3.stop(880, this.master)
-      note4.stop(550, this.master)
-    }, 1000)
+      voice1.stop(this.master)
+      voice2.stop(this.master)
+      voice3.stop(this.master)
+      voice4.stop(this.master)
+    }, 3000)
   }
+
 
   render() {
     return (
@@ -55,8 +56,10 @@ class App extends Component {
           >
             Learn React
           </a>
-          <button onClick={() => this.playOneNote()}>One</button>
-          <button onClick={() => this.playThreeNotes()}>3</button>
+          <button onClick={() => this.playOneVoice()}>One Voice</button>
+          <button onClick={() => this.playMultipleVoices()}>Multiple Voices</button>
+
+          <VuMeter ac={this.ac} node={this.master} />
         </header>
       </div>
     )
