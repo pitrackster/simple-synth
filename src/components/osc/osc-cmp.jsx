@@ -19,7 +19,7 @@ import Knob from './../knob'
 
 class Osc extends Component {
 
-  
+
 
   render() {
     return (
@@ -41,6 +41,8 @@ class Osc extends Component {
           max={4}
           step={1}
           onChange={this.props.handleOctaveChange}
+          width={50}
+          height={50}
         />
       </div>
     )

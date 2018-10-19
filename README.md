@@ -12,6 +12,7 @@ Create a simple web synth using react
 - http://www.oliphaunts.com/pianoroll-js/ well... a piano roll
 - https://musiclab.chromeexperiments.com/Experiments
 - https://tonejs.github.io/
+- https://github.com/joshjg/react-canvas-knob (just use the comp file)
 
 ## known issues
 - for hot reload to work on every js file change I had to follow this : https://github.com/webpack/docs/wiki/troubleshooting#not-enough-watchers
