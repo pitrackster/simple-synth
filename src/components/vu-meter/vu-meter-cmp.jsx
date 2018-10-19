@@ -1,20 +1,27 @@
 import React, { Component } from 'react'
 import {PropTypes as T} from 'prop-types'
+import './vu-meter-cmp.css'
 
 
 class VuMeter extends Component {
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
+    this.fillColor = '#fff'
     this.colors = {
       'accent': '#ff5500',
-      'fill': '#eeeeee',
+      'fill': 'rgba(255,255,255,0.1)',
       'border': '#e3e3e3',
       'mid': '#1af',
       'black': '#000000',
       'white': '#FFFFFF'
     }
     this.rafID = null
+  }
+
+  componentDidUpdate() {
+    // any state change in parent component will update childrens and loose this.context
+    this.context = this.canvas.getContext('2d')
   }
 
   componentDidMount() {
@@ -43,8 +50,8 @@ class VuMeter extends Component {
   draw(){
 
     if (this.dataArray) {
-      this.analyser.getByteTimeDomainData(this.dataArray)
 
+      this.analyser.getByteTimeDomainData(this.dataArray)
       const max = Math.max.apply(null, this.dataArray)
       const min = Math.min.apply(null, this.dataArray)
       let amp = max - min
@@ -86,7 +93,7 @@ class VuMeter extends Component {
 
   render() {
     return (
-      <canvas width={this.props.width} height={this.props.height} ref={canvas => {
+      <canvas className="meter" width={this.props.width} height={this.props.height} ref={canvas => {
         this.canvas = canvas
       }}>
       </canvas>

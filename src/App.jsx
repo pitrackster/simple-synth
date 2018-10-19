@@ -1,36 +1,99 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
-import './assets/css/App.css'
+import './App.css'
 import Voice from './core/voice'
-import VuMeter from './components/vu-meter-cmp'
+import VuMeter from './components/vu-meter/vu-meter-cmp'
+import Osc from './components/osc/osc-cmp'
 
 class App extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.ac = new AudioContext()
     this.master = this.ac.createGain()
     this.master.connect(this.ac.destination)
     this.master.gain.value = 1
     this.meter = null
+
+    this.initialState = {
+      ac: this.ac,
+      master: this.master,
+      vcoEnv: {
+        attack: 0, // seconds
+        decay: 1,  // seconds after decay time sustain gain level will be applied
+        sustain: 1, // gain value (0 <= value <= 1)
+        release: 0 // seconds
+      },
+      filter: {
+        freq: 0,
+        type: 'LP',
+        res: 0,
+        env : {
+          attack: 0, // seconds
+          decay: 1,  // seconds after decay time sustain gain level will be applied
+          sustain: 1, // gain value (0 <= value <= 1)
+          release: 0 // seconds
+        }
+      },
+      vco1: {
+        type: 'sine',
+        detune:0,
+        octave: 1
+      },
+      vco2: {
+        type: 'sine',
+        detune:0,
+        octave: 1
+      },
+      types: [
+        'sine',
+        'square',
+        'sawtooth',
+        'triangle'
+      ]
+    }
+
+    this.state = this.initialState
+
+  }
+
+  vco1OctaveChanged = (value) => {
+    this.setState(Object.assign(this.state.vco1, {octave: value}))
+  }
+
+  vco2OctaveChanged = (value) => {
+    this.setState(Object.assign(this.state.vco2, {octave: value}))
+  }
+
+  vco1TypeChanged(e) {
+    this.setState(Object.assign(this.state.vco1, {type: this.state.types[e.target.value]}))
+  }
+
+  vco2TypeChanged(e) {
+    this.setState(Object.assign(this.state.vco2, {type: this.state.types[e.target.value]}))
   }
 
   playOneVoice() {
-    const voice = new Voice(this.ac)
-    voice.start(440, 1, this.master)
+    const voice = new Voice(this.ac, this.state.vco1.type)
+    const voice2 = new Voice(this.ac, this.state.vco2.type)
+    const freq = 440
+    voice.start(freq * this.state.vco1.octave, 0.5, this.master)
+    voice2.start(freq * this.state.vco2.octave, 0.5, this.master)
     window.setTimeout(() => {
       voice.stop(this.master)
+      voice2.stop(this.master)
     }, 3000)
   }
 
   playMultipleVoices() {
-    const voice1 = new Voice(this.ac)
-    const voice2 = new Voice(this.ac)
-    const voice3 = new Voice(this.ac)
-    const voice4 = new Voice(this.ac)
-    voice1.start(440, 0.25, this.master)
-    voice2.start(220, 0.25, this.master)
-    voice3.start(880, 0.25, this.master)
-    voice4.start(550, 0.25, this.master)
+    const osc1Freq = 440
+    const osc2Freq = 320
+    const voice1 = new Voice(this.ac, this.state.vco1.type)
+    const voice2 = new Voice(this.ac, this.state.vco1.type)
+    const voice3 = new Voice(this.ac, this.state.vco2.type)
+    const voice4 = new Voice(this.ac, this.state.vco2.type)
+    voice1.start(osc1Freq * this.state.vco1.octave, 0.25, this.master)
+    voice2.start(osc1Freq * this.state.vco1.octave, 0.25, this.master)
+    voice3.start(osc2Freq * this.state.vco2.octave, 0.25, this.master)
+    voice4.start(osc2Freq * this.state.vco2.octave, 0.25, this.master)
     window.setTimeout(() => {
       voice1.stop(this.master)
       voice2.stop(this.master)
@@ -39,28 +102,39 @@ class App extends Component {
     }, 3000)
   }
 
+  octaveChanged(value) {
+    console.log('value', value)
+  }
+
 
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <button onClick={() => this.playOneVoice()}>One Voice</button>
-          <button onClick={() => this.playMultipleVoices()}>Multiple Voices</button>
+      <div className="app">
+        <h3>Simple Synth built with React</h3>
+        <p>The idea is (once again) to learn the basic's of react and see what is possible to do with the (fantastic) WebAudio API</p>
+        <button onClick={() => this.playOneVoice()}>Trigger one Voice</button>
+        <button onClick={() => this.playMultipleVoices()}>Trigger multiple Voices</button>
 
-          <VuMeter ac={this.ac} node={this.master} />
-        </header>
+        <div className="synth">
+          <div className="oscillators">
+            <Osc
+              octaveValue={this.state.vco1.octave}
+              handleOctaveChange={this.vco1OctaveChanged}
+              value={this.state.types.indexOf(this.state.vco1.type)}
+              title={'OSC1'}
+              label={this.state.vco1.type}
+              onChange={(e) => this.vco1TypeChanged(e)} />
+            <Osc
+              octaveValue={this.state.vco2.octave}
+              handleOctaveChange={this.vco2OctaveChanged}
+              value={this.state.types.indexOf(this.state.vco2.type)}
+              title={'OSC2'}
+              label={this.state.vco2.type}
+              onChange={(e) => this.vco2TypeChanged(e)} />
+          </div>
+          <VuMeter ac={this.state.ac} node={this.state.master} />
+        </div>
+
       </div>
     )
   }

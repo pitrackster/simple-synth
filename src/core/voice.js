@@ -1,7 +1,7 @@
 
 
 export default class Voice {
-  constructor(ac){
+  constructor(ac, type){
     this.ac = ac
     this.ENV = {
       attack: 0, // seconds
@@ -9,6 +9,7 @@ export default class Voice {
       sustain: 0.1, // gain value (0 <= value <= 1)
       release: 3 // seconds
     }
+    this.type = type
   }
 
   start(freq, volume, output) {
@@ -17,7 +18,7 @@ export default class Voice {
     this.vca = this.ac.createGain()
     this.vca.connect(output)
     this.vco.frequency.value = freq
-    this.vco.type = 'sine'
+    this.vco.type = this.type
     this.vco.detune.value = 0
     this.vco.start()
 

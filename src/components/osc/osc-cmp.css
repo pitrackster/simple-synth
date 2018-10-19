@@ -1,0 +1,46 @@
+
+.osc-item {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.range {
+  display: flex;
+}
+
+input[type="range"] {
+  appearance: slider-vertical;
+}
+
+.sliderticks {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.sliderticks label {
+  display: flex;
+}
+
+.icon {
+  height: 32px;
+  width: 60px;
+}
+
+.triangle {
+  background-image: url('./icons/triangle-small.png');
+}
+
+.sawtooth {
+  background-image: url('./icons/sawtooth-small.png');
+}
+
+.sine {
+  background-image: url('./icons/sine-small.png');
+}
+
+.square {
+  background-image: url('./icons/square-small.png');
+}
