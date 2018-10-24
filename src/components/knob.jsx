@@ -9,6 +9,9 @@ class Knob extends React.Component {
     min: PropTypes.number,
     max: PropTypes.number,
     step: PropTypes.number,
+    showTicks: PropTypes.bool,
+    tickThickness: PropTypes.number,
+    tickColor: PropTypes.string,
     log: PropTypes.bool,
     width: PropTypes.number,
     height: PropTypes.number,
@@ -49,6 +52,9 @@ class Knob extends React.Component {
     lineCap: 'butt',
     bgColor: '#EEE',
     fgColor: '#EA2',
+    showTicks: false,
+    tickThickness: 0.05,
+    tickColor: '#555',
     inputColor: '',
     font: 'Arial',
     fontWeight: 'bold',
@@ -294,6 +300,7 @@ class Knob extends React.Component {
     ctx.stroke()
     // foreground arc
     const a = this.getArcToValue(this.props.value)
+
     ctx.beginPath()
     ctx.strokeStyle = this.props.fgColor
     ctx.arc(
@@ -305,6 +312,26 @@ class Knob extends React.Component {
       a.acw
     )
     ctx.stroke()
+    // draw ticks if required
+    if(this.props.showTicks) {
+      for (let i = 1; i <= this.digits; i++) {
+        const b = this.getArcToValue(i)
+        ctx.beginPath()
+        ctx.strokeStyle = this.props.tickColor
+        const tickPosition =  b.startAngle + (b.endAngle - b.startAngle) / 2
+        ctx.arc(
+          this.xy,
+          this.xy,
+          this.radius,
+          tickPosition - this.props.tickThickness / 2,
+          tickPosition + this.props.tickThickness / 2,
+          a.acw
+        )
+        ctx.stroke()
+      }
+    }
+
+
   }
 
   renderCenter = () => {

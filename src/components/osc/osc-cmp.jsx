@@ -43,6 +43,11 @@ class Osc extends Component {
           onChange={this.props.handleOctaveChange}
           width={50}
           height={50}
+          angleArc={90}
+          cursor={10}
+          angleOffset={-45}
+          stopper={true}
+          showTicks={true}
         />
       </div>
     )
