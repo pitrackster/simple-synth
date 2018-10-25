@@ -273,7 +273,16 @@ class Knob extends React.Component {
     color: this.props.inputColor || this.props.fgColor,
     padding: '0px',
     WebkitAppearance: 'none',
-  });
+  })
+
+  labelStyle = () => ({
+    verticalAlign: 'middle',
+    marginTop: `-${(this.w - this.props.thickness * 100) >> 0}px`,
+    font: `${this.props.fontWeight} ${(this.w / 10 ) >> 0}px ${this.props.font}`,
+    textAlign: 'center',
+    color: this.props.inputColor || this.props.fgColor,
+    padding: '0px'
+  })
 
   drawCanvas() {
     const ctx = this.canvasRef.getContext('2d')
@@ -325,7 +334,7 @@ class Knob extends React.Component {
           this.radius,
           tickPosition - this.props.tickThickness / 2,
           tickPosition + this.props.tickThickness / 2,
-          a.acw
+          b.acw
         )
         ctx.stroke()
       }
@@ -358,7 +367,22 @@ class Knob extends React.Component {
       return displayCustom()
     }
     return null
-  };
+  }
+
+  renderLabel = () => {
+    const {
+      displayInput,
+      value,
+      title
+    } = this.props
+
+    if (displayInput) {
+      return (
+        <div style={this.labelStyle()}>{title ? `${title}: ${value}` : value}</div>
+      )
+    }
+    return null
+  }
 
   render() {
     const {
@@ -383,7 +407,7 @@ class Knob extends React.Component {
           onMouseDown={readOnly ? null : this.handleMouseDown}
           title={title ? `${title}: ${value}` : value}
         />
-        {this.renderCenter()}
+        {this.renderLabel()}
       </div>
     )
   }

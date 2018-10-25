@@ -13,6 +13,7 @@ Create a simple web synth using react
 - https://musiclab.chromeexperiments.com/Experiments
 - https://tonejs.github.io/
 - https://github.com/joshjg/react-canvas-knob (just use the comp file)
+- https://youtu.be/jif1RcaR7Cc interresting video ! (not too much to learn but good ideas ;-))
 
 ## known issues
 - for hot reload to work on every js file change I had to follow this : https://github.com/webpack/docs/wiki/troubleshooting#not-enough-watchers

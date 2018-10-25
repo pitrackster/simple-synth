@@ -14,6 +14,7 @@ class App extends Component {
     this.meter = null
 
     this.initialState = {
+      bgColor: '#282c34',
       ac: this.ac,
       master: this.master,
       vcoEnv: {
@@ -52,7 +53,11 @@ class App extends Component {
     }
 
     this.state = this.initialState
-
+  /*
+    window.onmousemouve = event => {
+      document.body.style.backgroundColor = `hsl(${event.clientX}, 60%, 60%)`
+    }
+*/
   }
 
   vco1OctaveChanged = (value) => {
@@ -106,15 +111,21 @@ class App extends Component {
     console.log('value', value)
   }
 
+  handleMouseMove(e) {
+    // document.body.style.backgroundColor = `hsl(${event.clientX}, 60%, 60%)
+    this.setState(Object.assign(this.state, {bgColor: `hsl(${e.clientX}, 60%, 60%)`}))
+  }
+
 
   render() {
     return (
-      <div className="app">
+      <div onMouseMove={(e) => this.handleMouseMove(e)} style={{backgroundColor:this.state.bgColor}} className="app">
         <h3>Simple Synth built with React</h3>
         <p>The idea is (once again) to learn the basic's of react and see what is possible to do with the (fantastic) WebAudio API</p>
         <button onClick={() => this.playOneVoice()}>Trigger one Voice</button>
         <button onClick={() => this.playMultipleVoices()}>Trigger multiple Voices</button>
-
+        <button onClick={() => this.playOneVoice()}>Start one note with 2 Voices</button>
+        <button onClick={() => this.playMultipleVoices()}>Start multiple notes with 2 Voices each</button>
         <div className="synth">
           <div className="oscillators">
             <Osc
