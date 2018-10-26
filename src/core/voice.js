@@ -1,13 +1,13 @@
 
 
 export default class Voice {
-  constructor(ac, type){
+  constructor(ac, type, env){
     this.ac = ac
-    this.ENV = {
+    this.ENV = env ? env : {
       attack: 0, // seconds
       decay: 1,  // seconds after decay time sustain gain level will be applied
       sustain: 0.1, // gain value (0 <= value <= 1)
-      release: 3 // seconds
+      release: 0.8 // seconds
     }
     this.type = type
   }
@@ -31,6 +31,10 @@ export default class Voice {
     // connect
     this.vco.connect(this.vca)
 
+  }
+
+  setEnv(env) {
+    this.ENV = env
   }
 
   stop(output) {

@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .app {
   text-align: center;
   background-color: #282c34;

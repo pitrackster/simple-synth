@@ -10,17 +10,12 @@ import Knob from './../knob'
  * - the oscillator type (sine, square, sawtooth, triangle)
  * - the octave (@TODO)
  * - the detune level (@TODO)
- *
- * Quite difficult to style input[type="range"] consistently..
- * This implementation works well with Firefox but don't with chrome ...
- * https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input/range
+ * 
  * @extends Component
  */
 
+
 class Osc extends Component {
-
-
-
   render() {
     return (
       <div className="osc-item">
@@ -51,6 +46,7 @@ class Osc extends Component {
           disableTextInput={true}
           title={'octave'}
         />
+
       </div>
     )
   }
