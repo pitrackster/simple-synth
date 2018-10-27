@@ -1,6 +1,21 @@
+.stage {
+  display: flex;
+}
+
 .xy-pad {
   /*min-height: 52vh;*/
   position: absolute;
   left: 0;
   top: 0;
 }
+/*https://developer.mozilla.org/fr/docs/Tutoriel_canvas/Optimizing_canvas*/
+
+.cursor-layer {
+   z-index: 2 ;
+   position: absolute;
+ }
+
+.background-layer {
+  z-index: 1;
+  position: absolute;
+ }

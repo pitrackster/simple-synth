@@ -10,20 +10,21 @@ class XYPad extends Component {
     this.width = 350
     this.height = 350
     this.state = {
-      pressed : false
+      pressed : false,
+      padBgColor: '#258975'
     }
   }
 
   componentDidMount = () => {
-    this.canvasPosition = this.layer1.getBoundingClientRect()
+    this.canvasPosition = this.bgLayer.getBoundingClientRect()
     this.canvasHeight = this.canvasPosition.bottom - this.canvasPosition.top
     this.canvasWidth = this.canvasPosition.right - this.canvasPosition.left
     this.draw()
-    this.ctx2 = this.layer2.getContext('2d')
+    this.ctx2 = this.cursorLayer.getContext('2d')
   }
 
   draw = () => {
-    this.ctx = this.layer1.getContext('2d')
+    this.ctx = this.bgLayer.getContext('2d')
 
     this.ctx.beginPath()
     // horizontal line
@@ -59,17 +60,22 @@ class XYPad extends Component {
 
   drawCursor = (data) => {
 
+
     this.ctx2.beginPath()
-    this.ctx2.arc(data.x, data.y2, 10, 0, 2*Math.PI)
-    this.ctx2.fillStyle = 'green'
+    this.ctx2.shadowBlur = this.width / 30
+    this.ctx2.shadowColor =  this.props.bgColor
+    this.ctx2.arc(data.x, data.y2, this.width / 20, 0, 2 * Math.PI)
+    this.ctx2.fillStyle =  this.state.padBgColor
+    this.ctx2.strokeStyle = `hsl(${data.x + data.y}, 60%, 60%)`
+    this.ctx2.lineWidth=5
     this.ctx2.fill()
     this.ctx2.stroke()
   }
 
   handleMove = (e) => {
-    const data = this.getPercentValues(e)
+    const data = this.getCoordinates(e)
     if(this.state.pressed) {
-      this.ctx2.clearRect(0, 0, this.layer2.width, this.layer2.height)
+      this.ctx2.clearRect(0, 0, this.cursorLayer.width, this.cursorLayer.height)
       this.drawCursor(data)
     }
 
@@ -78,12 +84,12 @@ class XYPad extends Component {
 
   handleDown = (e) => {
     this.setState(Object.assign(this.state, {pressed: true}))
-    const data = this.getPercentValues(e)
+    const data = this.getCoordinates(e)
     this.drawCursor(data)
     this.props.onPressStart(data)
   }
 
-  getPercentValues(e) {
+  getCoordinates(e) {
     const x = e.clientX - this.canvasPosition.left
     const y = this.canvasPosition.bottom - e.clientY //e.clientY - this.canvasPosition.top => inversed, bottom = max top = min...
     const percentX = x * 100 / this.canvasWidth
@@ -102,18 +108,18 @@ class XYPad extends Component {
   handleUp = (e) => {
     this.setState(Object.assign(this.state, {pressed: false}))
     this.props.onPressStop()
-    this.ctx2.clearRect(0, 0, this.layer2.width, this.layer2.height)
+    this.ctx2.clearRect(0, 0, this.cursorLayer.width, this.cursorLayer.height)
   }
 
   render = () => {
     return (
-      <div width={this.width} height={this.height} style={{position: 'relative', backgroundColor: this.props.bgColor}}>
-        <canvas onMouseDown={(e) => this.handleDown(e)} onMouseMove={(e) => this.handleMove(e)} onMouseUp={() => this.handleUp()} className="xy-pad" width={this.width} height={this.height} ref={canvas => {
-          this.layer1 = canvas
+      <div className={'stage'} style={{backgroundColor: this.props.bgColor, width: this.width + 'px',  height: this.height + 'px'}}>
+        <canvas className={'cursor-layer'} onMouseDown={(e) => this.handleDown(e)} onMouseMove={(e) => this.handleMove(e)} onMouseUp={() => this.handleUp()} width={this.width} height={this.height} ref={canvas => {
+          this.cursorLayer = canvas
         }}>
         </canvas>
-        <canvas style={{backgroundColor: '#258975'}} onMouseDown={(e) => this.handleDown(e)} onMouseMove={(e) => this.handleMove(e)} onMouseUp={() => this.handleUp()} width={this.width} height={this.height} ref={canvas => {
-          this.layer2 = canvas
+        <canvas  style={{backgroundColor: '#258975'}}  onMouseDown={(e) => this.handleDown(e)} onMouseMove={(e) => this.handleMove(e)} onMouseUp={() => this.handleUp()} className={'background-layer'} width={this.width} height={this.height} ref={canvas => {
+          this.bgLayer = canvas
         }}>
         </canvas>
       </div>
