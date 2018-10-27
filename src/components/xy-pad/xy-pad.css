@@ -2,12 +2,6 @@
   display: flex;
 }
 
-.xy-pad {
-  /*min-height: 52vh;*/
-  position: absolute;
-  left: 0;
-  top: 0;
-}
 /*https://developer.mozilla.org/fr/docs/Tutoriel_canvas/Optimizing_canvas*/
 
 .cursor-layer {

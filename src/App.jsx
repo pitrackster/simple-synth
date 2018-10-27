@@ -111,8 +111,13 @@ class App extends Component {
     // this.setState(Object.assign(this.state, {padBgColor: `hsl(${data.clientX}, 60%, 60%)`}))
     if(this.state.playing) {
       const frequency = Math.round(data.percentY * 1000 / 100)
+      const vca1Gain = (100 - data.percentX) / 100
+      const vca2Gain = data.percentX / 100
+      console.log(vca1Gain, vca2Gain, data.percentX)
       this.voices.forEach((voice, index) => {
         voice.vco.frequency.value =  index === 0 ? frequency * this.state.vco1.octave : frequency * this.state.vco2.octave
+        const gain = index === 0 ? vca1Gain : vca2Gain
+        voice.vca.gain.setValueAtTime(gain, this.ac.currentTime)
       })
       this.setState(Object.assign(this.state, {freq: frequency}))
     }
