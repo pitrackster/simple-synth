@@ -59,12 +59,10 @@ class XYPad extends Component {
   }
 
   drawCursor = (data) => {
-
-
     this.ctx2.beginPath()
-    this.ctx2.shadowBlur = this.width / 30
+    this.ctx2.shadowBlur = this.canvasWidth / 30
     this.ctx2.shadowColor =  this.props.bgColor
-    this.ctx2.arc(data.x, data.y2, this.width / 20, 0, 2 * Math.PI)
+    this.ctx2.arc(data.x, data.y2, this.canvasWidth / 20, 0, 2 * Math.PI)
     this.ctx2.fillStyle =  this.state.padBgColor
     this.ctx2.strokeStyle = `hsl(${data.x + data.y}, 60%, 60%)`
     this.ctx2.lineWidth=5

@@ -58,78 +58,45 @@ class App extends Component {
     this.state = this.initialState
   }
 
-  vco1OctaveChanged = (value) => {
-    this.setState(Object.assign(this.state.vco1, {octave: value}))
+  updateVcoOctave = (vco, value) => {
+    this.setState(Object.assign(vco, {octave: value}))
   }
 
-  vco2OctaveChanged = (value) => {
-    this.setState(Object.assign(this.state.vco2, {octave: value}))
-  }
-
-  vco1TypeChanged(e) {
-    this.setState(Object.assign(this.state.vco1, {type: this.state.types[e.target.value]}))
-  }
-
-  vco2TypeChanged(e) {
-    this.setState(Object.assign(this.state.vco2, {type: this.state.types[e.target.value]}))
-
-  }
-
-  playOneVoice() {
-    const voice = new Voice(this.ac, this.state.vco1.type)
-    const voice2 = new Voice(this.ac, this.state.vco2.type)
-    const freq = this.state.freq
-    voice.start(freq * this.state.vco1.octave, 0.5, this.master)
-    voice2.start(freq * this.state.vco2.octave, 0.5, this.master)
-    window.setTimeout(() => {
-      voice.stop(this.master)
-      voice2.stop(this.master)
-    }, 3000)
-  }
-
-  playMultipleVoices() {
-    const osc1Freq = 440
-    const osc2Freq = 320
-    const voice1 = new Voice(this.ac, this.state.vco1.type)
-    const voice2 = new Voice(this.ac, this.state.vco1.type)
-    const voice3 = new Voice(this.ac, this.state.vco2.type)
-    const voice4 = new Voice(this.ac, this.state.vco2.type)
-    voice1.start(osc1Freq * this.state.vco1.octave, 0.25, this.master)
-    voice2.start(osc1Freq * this.state.vco1.octave, 0.25, this.master)
-    voice3.start(osc2Freq * this.state.vco2.octave, 0.25, this.master)
-    voice4.start(osc2Freq * this.state.vco2.octave, 0.25, this.master)
-    window.setTimeout(() => {
-      voice1.stop(this.master)
-      voice2.stop(this.master)
-      voice3.stop(this.master)
-      voice4.stop(this.master)
-    }, 3000)
+  updateVcoType(vco, event) {
+    this.setState(Object.assign(vco, {type: this.state.types[event.target.value]}))
   }
 
   handleMouseMove(data) {
-    // document.body.style.backgroundColor = `hsl(${event.clientX}, 60%, 60%)
-    // this.setState(Object.assign(this.state, {padBgColor: `hsl(${data.clientX}, 60%, 60%)`}))
     if(this.state.playing) {
-      const frequency = Math.round(data.percentY * 1000 / 100)
-      const vca1Gain = (100 - data.percentX) / 100
-      const vca2Gain = data.percentX / 100
-      console.log(vca1Gain, vca2Gain, data.percentX)
+      const frequency = this.getFrequency(data)
+      const gains = this.getVcaGain(data)
       this.voices.forEach((voice, index) => {
         voice.vco.frequency.value =  index === 0 ? frequency * this.state.vco1.octave : frequency * this.state.vco2.octave
-        const gain = index === 0 ? vca1Gain : vca2Gain
+        const gain = index === 0 ? gains.gain1 : gains.gain2
         voice.vca.gain.setValueAtTime(gain, this.ac.currentTime)
       })
       this.setState(Object.assign(this.state, {freq: frequency}))
     }
   }
 
+  getVcaGain = (data) => {
+    const vca1Gain = (100 - data.percentX) / 100
+    const vca2Gain = data.percentX / 100
+    return {gain1: vca1Gain, gain2: vca2Gain}
+  }
+
+  getFrequency = (data) => {
+    return Math.round(data.percentY * 1000 / 100)
+  }
+
   onPressStart = (data) => {
-    const frequency = Math.round(data.percentY * 1000 / 100)
+    const frequency = this.getFrequency(data)
+    const gains = this.getVcaGain(data)
     const voice1 = new Voice(this.ac, this.state.vco1.type, this.state.vcoEnv)
     const voice2 = new Voice(this.ac, this.state.vco2.type, this.state.vcoEnv)
-    this.voices = [voice1,voice2]
-    voice1.start(frequency * this.state.vco1.octave, 1 / this.voices.length, this.master)
-    voice2.start(frequency * this.state.vco2.octave, 1 / this.voices.length, this.master)
+    this.voices = [voice1, voice2]
+    voice1.start(frequency * this.state.vco1.octave, gains.gain1, this.master)
+    voice2.start(frequency * this.state.vco2.octave, gains.gain2, this.master)
 
     this.setState(Object.assign(this.state, {playing: true, freq: frequency}))
   }
@@ -147,25 +114,23 @@ class App extends Component {
     return (
       <div className="app">
         <h3>Simple Synth built with React</h3>
-        <p>The idea is (once again) to learn the basic's of react and see what is possible to do with the (fantastic) WebAudio API</p>
-        <button onClick={() => this.playOneVoice()}>Trigger one Voice</button>
-        <button onClick={() => this.playMultipleVoices()}>Trigger multiple Voices</button>
+        <p>Play with react and the WebAudio API</p>
         <div className="synth">
           <div className="oscillators">
             <Osc
               octaveValue={this.state.vco1.octave}
-              handleOctaveChange={this.vco1OctaveChanged}
+              handleOctaveChange={(value) => this.updateVcoOctave(this.state.vco1, value)}
               value={this.state.types.indexOf(this.state.vco1.type)}
               title={'OSC1'}
               label={this.state.vco1.type}
-              onChange={(e) => this.vco1TypeChanged(e)} />
+              onChange={(e) => this.updateVcoType(this.state.vco1, e)} />
             <Osc
               octaveValue={this.state.vco2.octave}
-              handleOctaveChange={this.vco2OctaveChanged}
+              handleOctaveChange={(value) => this.updateVcoOctave(this.state.vco2, value)}
               value={this.state.types.indexOf(this.state.vco2.type)}
               title={'OSC2'}
               label={this.state.vco2.type}
-              onChange={(e) => this.vco2TypeChanged(e)} />
+              onChange={(e) => this.updateVcoType(this.state.vco2, e)} />
           </div>
           <XYPad bgColor={this.state.padBgColor} onPressStart={this.onPressStart} onPressStop={this.onPressStop} onMove={(data) => this.handleMouseMove(data)} />
           <VuMeter ac={this.state.ac} node={this.state.master} />
