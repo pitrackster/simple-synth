@@ -16,16 +16,29 @@ class XYPad extends Component {
   }
 
   componentDidMount = () => {
+    this.setContextAndPositions()
+    window.addEventListener('resize', this.setContextAndPositions)
+    this.draw()
+  }
+
+  /*componentDidUpdate() {
+    // any state change in parent component will update childrens and loose this.context
+    this.setContextAndPositions()
+  }*/
+
+  componentWillUnmount = () => {
+    window.aremoveEventListener('resize', this.setContextAndPositions)
+  }
+
+  setContextAndPositions = () => {
     this.canvasPosition = this.bgLayer.getBoundingClientRect()
     this.canvasHeight = this.canvasPosition.bottom - this.canvasPosition.top
     this.canvasWidth = this.canvasPosition.right - this.canvasPosition.left
-    this.draw()
+    this.ctx = this.bgLayer.getContext('2d')
     this.ctx2 = this.cursorLayer.getContext('2d')
   }
 
   draw = () => {
-    this.ctx = this.bgLayer.getContext('2d')
-
     this.ctx.beginPath()
     // horizontal line
     this.ctx.moveTo(0, this.canvasHeight / 2)
@@ -63,7 +76,7 @@ class XYPad extends Component {
     this.ctx2.shadowBlur = this.canvasWidth / 30
     this.ctx2.shadowColor =  this.props.bgColor
     this.ctx2.arc(data.x, data.y2, this.canvasWidth / 20, 0, 2 * Math.PI)
-    this.ctx2.fillStyle =  this.state.padBgColor
+    this.ctx2.fillStyle =  'transparent' //this.state.padBgColor
     this.ctx2.strokeStyle = `hsl(${data.x + data.y}, 60%, 60%)`
     this.ctx2.lineWidth=5
     this.ctx2.fill()

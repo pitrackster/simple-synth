@@ -20,3 +20,4 @@ Create a simple web synth using react
 - it seems like firefox has a problem with something that results in an `InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable` message
 - It seems quite difficult to style input[type="range"] consistently across browsers... https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input/range
 - canvas "layers" ... the layer 2 does not take the whole height... why ??
+- when window is resized coordinates are not up to date...

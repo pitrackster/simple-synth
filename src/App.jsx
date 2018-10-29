@@ -4,6 +4,7 @@ import Voice from './core/voice'
 import VuMeter from './components/vu-meter/vu-meter-cmp'
 import Osc from './components/osc/osc-cmp'
 import XYPad from './components/xy-pad/xy-pad'
+import Env from './components/envelope/env-cmp'
 
 class App extends Component {
   constructor(props) {
@@ -101,6 +102,12 @@ class App extends Component {
     this.setState(Object.assign(this.state, {playing: true, freq: frequency}))
   }
 
+  oscEnvChanged = (prop, value) => {
+    const clonedEnv = Object.assign({}, this.state.vcoEnv)
+    clonedEnv[prop] = Number(value)
+    this.setState(Object.assign(this.state, {vcoEnv: clonedEnv}))
+  }
+
   onPressStop = () => {
     this.voices.forEach(voice => {
       voice.stop(this.master)
@@ -132,6 +139,7 @@ class App extends Component {
               label={this.state.vco2.type}
               onChange={(e) => this.updateVcoType(this.state.vco2, e)} />
           </div>
+          <Env env={this.state.vcoEnv} onChange={this.oscEnvChanged}/>
           <XYPad bgColor={this.state.padBgColor} onPressStart={this.onPressStart} onPressStop={this.onPressStop} onMove={(data) => this.handleMouseMove(data)} />
           <VuMeter ac={this.state.ac} node={this.state.master} />
           <div style={{width:350}}>
