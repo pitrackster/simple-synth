@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {PropTypes as T} from 'prop-types'
+import React, { Component } from 'react'
+import { PropTypes as T } from 'prop-types'
 import './env-cmp.css'
 
 
@@ -38,8 +38,8 @@ class Env extends Component {
 
 
 Env.propTypes = {
-  onChange: T.func,
-  env: T.object
+  onChange: T.func.isRequired,
+  env: T.object.isRequired
 }
 
 export default Env

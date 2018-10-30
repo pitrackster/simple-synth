@@ -5,6 +5,7 @@ import VuMeter from './components/vu-meter/vu-meter-cmp'
 import Osc from './components/osc/osc-cmp'
 import XYPad from './components/xy-pad/xy-pad'
 import Env from './components/envelope/env-cmp'
+import Filter from './components/filter/filter-cmp'
 
 class App extends Component {
   constructor(props) {
@@ -12,8 +13,13 @@ class App extends Component {
     this.ac = new AudioContext()
     this.master = this.ac.createGain()
     this.master.connect(this.ac.destination)
-    this.master.gain.value = 1
+    this.master.gain.setValueAtTime(0.5, this.ac.currentTime)
     this.meter = null
+
+    this.voicesMix = this.ac.createGain()
+    this.voicesMix.gain.setValueAtTime(0.8, this.ac.currentTime)
+    this.voicesMix.connect(this.master)
+
 
     this.initialState = {
       padBgColor: '#eee',
@@ -27,8 +33,10 @@ class App extends Component {
         release: 0.5 // seconds
       },
       filter: {
-        freq: 0,
-        type: 'LP',
+        freq: 512,
+        q: 7,
+        gain: 1,
+        type: 'lowpass',
         res: 0,
         env : {
           attack: 0, // seconds
@@ -57,14 +65,37 @@ class App extends Component {
     }
 
     this.state = this.initialState
+
+    this.biquadFilter = this.ac.createBiquadFilter()
+    this.biquadFilter.type = this.state.filter.type
+    this.biquadFilter.frequency.setValueAtTime(this.state.filter.freq, this.ac.currentTime)
+    //this.biquadFilter.gain.setValueAtTime(clonedFilter.gain, this.ac.currentTime)
+    this.biquadFilter.Q.setValueAtTime(this.state.filter.q, this.ac.currentTime)
+    //  this.master.connect(this.biquadFilter)
+    this.biquadFilter.connect(this.voicesMix)
   }
 
   updateVcoOctave = (vco, value) => {
     this.setState(Object.assign(vco, {octave: value}))
   }
 
-  updateVcoType(vco, event) {
+  updateVcoType = (vco, event) => {
     this.setState(Object.assign(vco, {type: this.state.types[event.target.value]}))
+  }
+
+  filterChanged = (property, event) => {
+    const value = property === 'freq' || property === 'gain' || property ==='q' ? Number(event.target.value) : event.target.value
+    const clonedFilter = Object.assign({}, this.state.filter)
+    clonedFilter[property] = value
+
+    console.log('value', value)
+
+    this.biquadFilter.type = clonedFilter.type
+    this.biquadFilter.frequency.setValueAtTime(clonedFilter.freq, this.ac.currentTime)
+    this.biquadFilter.gain.setValueAtTime(clonedFilter.gain, this.ac.currentTime)
+    this.biquadFilter.Q.setValueAtTime(clonedFilter.q, this.ac.currentTime)
+
+    this.setState(Object.assign(this.state, {filter: clonedFilter}))
   }
 
   handleMouseMove(data) {
@@ -72,7 +103,8 @@ class App extends Component {
       const frequency = this.getFrequency(data)
       const gains = this.getVcaGain(data)
       this.voices.forEach((voice, index) => {
-        voice.vco.frequency.value =  index === 0 ? frequency * this.state.vco1.octave : frequency * this.state.vco2.octave
+        const freq = index === 0 ? frequency * this.state.vco1.octave : frequency * this.state.vco2.octave
+        voice.vco.frequency.linearRampToValueAtTime(freq, this.ac.currentTime + 0.2)  
         const gain = index === 0 ? gains.gain1 : gains.gain2
         voice.vca.gain.setValueAtTime(gain, this.ac.currentTime)
       })
@@ -96,8 +128,8 @@ class App extends Component {
     const voice1 = new Voice(this.ac, this.state.vco1.type, this.state.vcoEnv)
     const voice2 = new Voice(this.ac, this.state.vco2.type, this.state.vcoEnv)
     this.voices = [voice1, voice2]
-    voice1.start(frequency * this.state.vco1.octave, gains.gain1, this.master)
-    voice2.start(frequency * this.state.vco2.octave, gains.gain2, this.master)
+    voice1.start(frequency * this.state.vco1.octave, gains.gain1, this.biquadFilter)
+    voice2.start(frequency * this.state.vco2.octave, gains.gain2, this.biquadFilter)
 
     this.setState(Object.assign(this.state, {playing: true, freq: frequency}))
   }
@@ -110,7 +142,7 @@ class App extends Component {
 
   onPressStop = () => {
     this.voices.forEach(voice => {
-      voice.stop(this.master)
+      voice.stop(this.biquadFilter)
     })
     this.voices = []
     this.setState(Object.assign(this.state, {playing: false}))
@@ -140,6 +172,7 @@ class App extends Component {
               onChange={(e) => this.updateVcoType(this.state.vco2, e)} />
           </div>
           <Env env={this.state.vcoEnv} onChange={this.oscEnvChanged}/>
+          <Filter onChange={this.filterChanged} q={this.state.filter.q} gain={this.state.filter.gain} type={this.state.filter.type} frequency={this.state.filter.freq} />
           <XYPad bgColor={this.state.padBgColor} onPressStart={this.onPressStart} onPressStop={this.onPressStop} onMove={(data) => this.handleMouseMove(data)} />
           <VuMeter ac={this.state.ac} node={this.state.master} />
           <div style={{width:350}}>
