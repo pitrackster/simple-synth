@@ -1,0 +1,25 @@
+.filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #fff;
+  margin: 5px;
+  padding: 10px;
+  height: 90%;
+  width: 200px;
+}
+
+.range-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radio-group{
+  display: flex;
+  flex-direction: column;
+}
+.labeled-radio{
+  display      : flex;
+}

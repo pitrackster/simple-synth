@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {PropTypes as T} from 'prop-types'
 import './osc-cmp.css'
-import Knob from './../knob'
+//import Knob from './../knob'
 
 /**
  *
@@ -10,7 +10,25 @@ import Knob from './../knob'
  * - the oscillator type (sine, square, sawtooth, triangle)
  * - the octave (@TODO)
  * - the detune level (@TODO)
- * 
+ *
+ *   <Knob
+     value={this.props.octaveValue}
+     min={-2}
+     max={2}
+     step={1}
+     onChange={this.props.handleOctaveChange}
+     width={80}
+     height={80}
+     angleArc={90}
+     cursor={10}
+     angleOffset={-45}
+     stopper={true}
+     showTicks={true}
+     disableTextInput={true}
+     title={'octave'}
+   />
+
+ *
  * @extends Component
  */
 
@@ -30,22 +48,9 @@ class Osc extends Component {
           </div>
         </div>
         <label>{this.props.label}</label>
-        <Knob
-          value={this.props.octaveValue}
-          min={1}
-          max={4}
-          step={1}
-          onChange={this.props.handleOctaveChange}
-          width={80}
-          height={80}
-          angleArc={90}
-          cursor={10}
-          angleOffset={-45}
-          stopper={true}
-          showTicks={true}
-          disableTextInput={true}
-          title={'octave'}
-        />
+        <hr/>
+        <label>Octave {this.props.octaveValue}</label>
+        <input value={this.props.octaveValue} onChange={(e) => this.props.handleOctaveChange(e)} type="range" min="-2" max="2" step="1"></input>
 
       </div>
     )
